@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Open Firenet",
+        "data": {
+          "host": "IP address or hostname",
+          "scan_interval": "Poll interval (seconds)"
+        },
+        "data_description": {
+          "host": "Example: 192.168.1.42",
+          "scan_interval": "How often to poll the bridge, in seconds (10–300)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the device. Check the IP address and that the device is online.",
+      "invalid_response": "Device responded but does not look like an Open Firenet bridge.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}
