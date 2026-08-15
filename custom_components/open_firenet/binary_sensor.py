@@ -23,6 +23,7 @@ async def async_setup_entry(
 class OpenFirenetConnected(CoordinatorEntity[OpenFirenetCoordinator], BinarySensorEntity):
     _attr_has_entity_name = True
     _attr_name = "Connected"
+    _attr_translation_key = "connected"
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
     def __init__(self, coordinator: OpenFirenetCoordinator, entry: ConfigEntry) -> None:

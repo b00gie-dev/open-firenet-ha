@@ -1,0 +1,17 @@
+{
+  "entity": {
+    "climate": {
+      "open_firenet": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "manual": "Manual",
+              "auto": "Automatic",
+              "comfort": "Comfort"
+            }
+          }
+        }
+      }
+    }
+  }
+}

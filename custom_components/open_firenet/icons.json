@@ -6,6 +6,15 @@
         "state": {
           "heat": "mdi:fireplace",
           "off": "mdi:fireplace-off"
+        },
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "manual": "mdi:thermostat-cog",
+              "auto": "mdi:thermostat-auto",
+              "comfort": "mdi:sofa"
+            }
+          }
         }
       }
     },

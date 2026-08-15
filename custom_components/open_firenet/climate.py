@@ -24,7 +24,7 @@ from .const import (
 )
 from .coordinator import OpenFirenetCoordinator
 
-FAN_MODES = [str(p) for p in range(HEATING_POWER_MIN, HEATING_POWER_MAX + 1, 10)]
+FAN_MODES = [str(p) for p in range(HEATING_POWER_MIN, HEATING_POWER_MAX + 1, 5)]
 PRESET_MODES = list(OPERATING_MODES.values())
 
 
