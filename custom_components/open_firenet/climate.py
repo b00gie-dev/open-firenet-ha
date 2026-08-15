@@ -38,6 +38,7 @@ async def async_setup_entry(
 class OpenFirenetClimate(CoordinatorEntity[OpenFirenetCoordinator], ClimateEntity):
     _attr_has_entity_name = True
     _attr_name = None
+    _attr_translation_key = "open_firenet"
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT]
     _attr_preset_modes = PRESET_MODES
