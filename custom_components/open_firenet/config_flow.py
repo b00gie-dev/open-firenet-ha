@@ -8,7 +8,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 
-from .const import API_STATUS, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import API_STATE, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,10 +33,10 @@ class OpenFirenetConfigFlow(ConfigFlow, domain=DOMAIN):
             try:
                 async with asyncio.timeout(8):
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f"http://{host}{API_STATUS}") as resp:
+                        async with session.get(f"http://{host}{API_STATE}") as resp:
                             resp.raise_for_status()
                             data = await resp.json()
-                            if "mainLoop" not in data:
+                            if "device" not in data:
                                 errors["base"] = "invalid_response"
             except asyncio.TimeoutError:
                 errors["base"] = "cannot_connect"
