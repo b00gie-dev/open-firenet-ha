@@ -138,6 +138,7 @@ class OpenFirenetSensor(CoordinatorEntity[OpenFirenetCoordinator], SensorEntity)
         super().__init__(coordinator)
         self.entity_description = description
         self._entry = entry
+        self._attr_translation_key = description.key
         self._attr_unique_id = f"{entry.entry_id}_sensor_{description.key}"
 
     @property

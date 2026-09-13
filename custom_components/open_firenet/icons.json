@@ -1,14 +1,56 @@
 {
-  "entity_component": {
+  "entity": {
     "climate": {
-      "default": "mdi:fireplace-off",
-      "state": {
-        "heat": "mdi:fireplace",
-        "off": "mdi:fireplace-off"
+      "open_firenet": {
+        "default": "mdi:fireplace-off",
+        "state": {
+          "heat": "mdi:fireplace",
+          "off": "mdi:fireplace-off"
+        }
       }
     },
     "binary_sensor": {
-      "connectivity": "mdi:wifi-check"
+      "connected": {
+        "default": "mdi:lan-connect",
+        "state": {
+          "on": "mdi:lan-connect",
+          "off": "mdi:lan-disconnect"
+        }
+      },
+      "burning": {
+        "default": "mdi:fire",
+        "state": {
+          "on": "mdi:fire",
+          "off": "mdi:fire-off"
+        }
+      },
+      "problem": {
+        "default": "mdi:alert-circle-outline",
+        "state": {
+          "on": "mdi:alert-circle",
+          "off": "mdi:check-circle-outline"
+        }
+      }
+    },
+    "sensor": {
+      "operational_state": {
+        "default": "mdi:heating-coil"
+      },
+      "sub_state": {
+        "default": "mdi:numeric"
+      },
+      "pellet_consumption": {
+        "default": "mdi:weight-kilogram"
+      },
+      "pellet_runtime": {
+        "default": "mdi:timer-outline"
+      },
+      "service_countdown": {
+        "default": "mdi:wrench-clock"
+      },
+      "flue_fan_speed": {
+        "default": "mdi:fan"
+      }
     }
   }
 }
