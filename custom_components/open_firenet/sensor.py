@@ -145,11 +145,12 @@ class OpenFirenetSensor(CoordinatorEntity[OpenFirenetCoordinator], SensorEntity)
     def device_info(self) -> dict:
         device = self.coordinator.data.get("device", {})
         stove = self.coordinator.data.get("stove", {})
+        model_name = stove.get("model_name") or {10: "INTERNO", 13: "DOMO", 23: "DOMO BACK"}.get(stove.get("model"), f"Model {stove.get('model', 'Unknown')}")
         return {
             "identifiers": {(DOMAIN, self._entry.entry_id)},
             "name": device.get("name", "Open-Firenet"),
             "manufacturer": "Open-Firenet",
-            "model": f"Stove Model {stove.get('model', 'DOMO')}",
+            "model": f"RIKA {model_name}",
             "sw_version": f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
             "configuration_url": f"http://{self.coordinator.host}",
         }
