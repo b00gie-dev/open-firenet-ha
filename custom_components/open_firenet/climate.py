@@ -15,16 +15,15 @@ from .const import (
     DOMAIN,
     HEATING_POWER_MAX,
     HEATING_POWER_MIN,
+    HEATING_POWER_STEP,
     OPERATING_MODES,
-    OPERATING_MODES_REVERSE,
-    ROOM_TEMP_KEYS,
     TEMP_MAX,
     TEMP_MIN,
     TEMP_STEP,
 )
 from .coordinator import OpenFirenetCoordinator
 
-FAN_MODES = [str(p) for p in range(HEATING_POWER_MIN, HEATING_POWER_MAX + 1, 10)]
+FAN_MODES = [str(p) for p in range(HEATING_POWER_MIN, HEATING_POWER_MAX + 1, HEATING_POWER_STEP)]
 PRESET_MODES = list(OPERATING_MODES.values())
 
 
@@ -55,67 +54,70 @@ class OpenFirenetClimate(CoordinatorEntity[OpenFirenetCoordinator], ClimateEntit
 
     def __init__(self, coordinator: OpenFirenetCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator)
+        self._entry = entry
         self._attr_unique_id = f"{entry.entry_id}_climate"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, entry.entry_id)},
-            "name": "Open Firenet",
-            "manufacturer": "Open Firenet",
-            "model": "Rika WiFi Bridge",
-            "configuration_url": f"http://{coordinator.host}",
+
+    @property
+    def device_info(self) -> dict:
+        device = self.coordinator.data.get("device", {})
+        stove = self.coordinator.data.get("stove", {})
+        return {
+            "identifiers": {(DOMAIN, self._entry.entry_id)},
+            "name": device.get("name", "Open-Firenet"),
+            "manufacturer": "Open-Firenet",
+            "model": f"Stove Model {stove.get('model', 'DOMO')}",
+            "sw_version": f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
+            "configuration_url": f"http://{self.coordinator.host}",
         }
 
     @property
     def _controls(self) -> dict:
-        return self.coordinator.data["controls"]
+        return self.coordinator.data.get("controls", {})
 
     @property
     def current_temperature(self) -> float | None:
         sensors = self.coordinator.data.get("sensors", {})
-        for key in ROOM_TEMP_KEYS:
-            raw = sensors.get(key)
-            if raw is not None:
-                try:
-                    return float(raw) / 10
-                except (TypeError, ValueError):
-                    pass
+        val = sensors.get("room_temperature")
+        if val is not None:
+            return float(val)
+        return None
+
+    @property
+    def target_temperature(self) -> float | None:
+        val = self._controls.get("target_temperature")
+        if val is not None:
+            return float(val)
         return None
 
     @property
     def hvac_mode(self) -> HVACMode:
-        return HVACMode.HEAT if self._controls.get("onOff", 0) == 1 else HVACMode.OFF
+        return HVACMode.HEAT if self._controls.get("on") else HVACMode.OFF
 
     @property
     def preset_mode(self) -> str | None:
-        return OPERATING_MODES.get(self._controls.get("operatingMode", 2))
-
-    @property
-    def target_temperature(self) -> float | None:
-        raw = self._controls.get("tempRoomTarget")
-        return raw / 10 if raw is not None else None
+        return self._controls.get("mode", "comfort")
 
     @property
     def fan_mode(self) -> str | None:
-        power = self._controls.get("heatingPower")
-        return str(power) if power is not None else None
+        power = self._controls.get("power_percent")
+        return str(power) if power is not None else "70"
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
-        await self.coordinator.async_set_controls(onOff=1 if hvac_mode == HVACMode.HEAT else 0)
+        await self.coordinator.async_set_controls(on=(hvac_mode == HVACMode.HEAT))
 
     async def async_turn_on(self) -> None:
-        await self.coordinator.async_set_controls(onOff=1)
+        await self.coordinator.async_set_controls(on=True)
 
     async def async_turn_off(self) -> None:
-        await self.coordinator.async_set_controls(onOff=0)
+        await self.coordinator.async_set_controls(on=False)
 
     async def async_set_temperature(self, **kwargs) -> None:
         temp = kwargs.get(ATTR_TEMPERATURE)
         if temp is not None:
-            await self.coordinator.async_set_controls(tempRoomTarget=int(temp * 10))
+            await self.coordinator.async_set_controls(target_temperature=float(temp))
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        mode_int = OPERATING_MODES_REVERSE.get(preset_mode)
-        if mode_int is not None:
-            await self.coordinator.async_set_controls(operatingMode=mode_int)
+        await self.coordinator.async_set_controls(mode=preset_mode)
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
-        await self.coordinator.async_set_controls(heatingPower=int(fan_mode))
+        await self.coordinator.async_set_controls(power_percent=int(fan_mode))

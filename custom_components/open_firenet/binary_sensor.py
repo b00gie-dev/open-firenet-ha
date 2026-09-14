@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any, Callable
+
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
+    BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -13,25 +17,76 @@ from .const import DOMAIN
 from .coordinator import OpenFirenetCoordinator
 
 
+@dataclass(frozen=True, kw_only=True)
+class OpenFirenetBinarySensorDescription(BinarySensorEntityDescription):
+    value_fn: Callable[[dict[str, Any]], bool]
+
+
+BINARY_SENSOR_TYPES: tuple[OpenFirenetBinarySensorDescription, ...] = (
+    OpenFirenetBinarySensorDescription(
+        key="connected",
+        name="Connected",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        value_fn=lambda data: data.get("device", {}).get("connected", False),
+    ),
+    OpenFirenetBinarySensorDescription(
+        key="burning",
+        name="Combustion Active",
+        icon="mdi:fire",
+        value_fn=lambda data: data.get("stove", {}).get("is_burning", False),
+    ),
+    OpenFirenetBinarySensorDescription(
+        key="problem",
+        name="Stove Error",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        value_fn=lambda data: data.get("stove", {}).get("has_error", False),
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: OpenFirenetCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([OpenFirenetConnected(coordinator, entry)])
+    async_add_entities(
+        [
+            OpenFirenetBinarySensor(coordinator, entry, description)
+            for description in BINARY_SENSOR_TYPES
+        ]
+    )
 
 
-class OpenFirenetConnected(CoordinatorEntity[OpenFirenetCoordinator], BinarySensorEntity):
+class OpenFirenetBinarySensor(
+    CoordinatorEntity[OpenFirenetCoordinator], BinarySensorEntity
+):
+    entity_description: OpenFirenetBinarySensorDescription
     _attr_has_entity_name = True
-    _attr_name = "Connected"
-    _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
-    def __init__(self, coordinator: OpenFirenetCoordinator, entry: ConfigEntry) -> None:
+    def __init__(
+        self,
+        coordinator: OpenFirenetCoordinator,
+        entry: ConfigEntry,
+        description: OpenFirenetBinarySensorDescription,
+    ) -> None:
         super().__init__(coordinator)
-        self._attr_unique_id = f"{entry.entry_id}_connected"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, entry.entry_id)},
+        self.entity_description = description
+        self._entry = entry
+        self._attr_translation_key = description.key
+        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+
+    @property
+    def device_info(self) -> dict:
+        device = self.coordinator.data.get("device", {})
+        stove = self.coordinator.data.get("stove", {})
+        return {
+            "identifiers": {(DOMAIN, self._entry.entry_id)},
+            "name": device.get("name", "Open-Firenet"),
+            "manufacturer": "Open-Firenet",
+            "model": f"Stove Model {stove.get('model', 'DOMO')}",
+            "sw_version": f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
+            "configuration_url": f"http://{self.coordinator.host}",
         }
 
     @property
     def is_on(self) -> bool:
-        return self.coordinator.data.get("status", {}).get("mainLoop", False)
+        return self.entity_description.value_fn(self.coordinator.data)

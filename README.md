@@ -1,5 +1,9 @@
 # Open Firenet — Home Assistant Integration
 
+<p align="center">
+  <img src="custom_components/open_firenet/brand/logo.png" alt="Open Firenet Logo" width="400">
+</p>
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 Home Assistant integration for Rika pellet stoves controlled via the [open-firenet](https://github.com/openfirenet/open-firenet) WiFi bridge.

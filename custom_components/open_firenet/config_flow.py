@@ -8,7 +8,8 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 
-from .const import API_STATUS, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .api import OpenFirenetClient
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,14 +31,11 @@ class OpenFirenetConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             host = user_input[CONF_HOST].strip().rstrip("/")
+            client = OpenFirenetClient(host)
             try:
                 async with asyncio.timeout(8):
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(f"http://{host}{API_STATUS}") as resp:
-                            resp.raise_for_status()
-                            data = await resp.json()
-                            if "mainLoop" not in data:
-                                errors["base"] = "invalid_response"
+                    if not await client.async_validate():
+                        errors["base"] = "invalid_response"
             except asyncio.TimeoutError:
                 errors["base"] = "cannot_connect"
             except aiohttp.ClientError:
@@ -45,6 +43,8 @@ class OpenFirenetConfigFlow(ConfigFlow, domain=DOMAIN):
             except Exception:
                 _LOGGER.exception("Unexpected error during config flow")
                 errors["base"] = "unknown"
+            finally:
+                await client.close()
 
             if not errors:
                 await self.async_set_unique_id(host)
