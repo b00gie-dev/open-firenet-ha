@@ -5,7 +5,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL, Platform
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .binary_sensor import BINARY_SENSOR_TYPES
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
@@ -73,6 +73,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Automatically purge orphaned entities from earlier versions
     _cleanup_orphaned_entities(hass, entry)
+
+    # Ensure device registry reflects current stove model and versions
+    device_reg = dr.async_get(hass)
+    device = coordinator.data.get("device", {})
+    stove = coordinator.data.get("stove", {})
+    model_name = stove.get("model_name") or {10: "INTERNO", 13: "DOMO", 23: "DOMO BACK"}.get(stove.get("model"), f"Model {stove.get('model', 'Unknown')}")
+    device_reg.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, entry.entry_id)},
+        name=device.get("name", "Open-Firenet"),
+        manufacturer="Open-Firenet",
+        model=f"RIKA {model_name}",
+        sw_version=f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
+        configuration_url=f"http://{coordinator.host}",
+    )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
