@@ -20,6 +20,7 @@ from .const import (
     TEMP_MAX,
     TEMP_MIN,
     TEMP_STEP,
+    get_model_name,
 )
 from .coordinator import OpenFirenetCoordinator
 
@@ -61,11 +62,12 @@ class OpenFirenetClimate(CoordinatorEntity[OpenFirenetCoordinator], ClimateEntit
     def device_info(self) -> dict:
         device = self.coordinator.data.get("device", {})
         stove = self.coordinator.data.get("stove", {})
+        model_name = stove.get("model_name") or get_model_name(stove.get("model"))
         return {
             "identifiers": {(DOMAIN, self._entry.entry_id)},
             "name": device.get("name", "Open-Firenet"),
             "manufacturer": "Open-Firenet",
-            "model": f"Stove Model {stove.get('model', 'DOMO')}",
+            "model": f"RIKA {model_name}",
             "sw_version": f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
             "configuration_url": f"http://{self.coordinator.host}",
         }
