@@ -14,7 +14,7 @@ Custom Home Assistant integration for RIKA pellet stoves controlled via the [ope
 - **MultiAir 1 & 2 Fan Controls**: Dedicated fan entities for MultiAir convection fans with on/off, Auto regulation, and manual speeds 1 to 5 (automatically enabled for MultiAir-equipped models).
 - **MultiAir Convection Trim**: Number sliders for -30% to +30% fine tuning of convection output.
 - **Weekly Heating Schedule**: Enable or disable the stove's internal weekly heating schedule via a switch, and adjust the setback temperature (10°C–25°C).
-- **Hopper Lid Sensor**: Real-time detection when the pellet hopper (trémie) lid is opened.
+- **Hopper Lid Sensor**: Real-time detection when the pellet hopper lid is opened.
 - **Full Sensor Telemetry**: Room temperature, combustion chamber temperature, mainboard temperature, pellet consumption counters, service countdown, draft and auger RPMs, operating state, and WiFi signal strength.
 - **26 RIKA Stove Models**: Automatic model detection and naming in device registry (DOMO, PARO, SUMO, FILO, COMO, etc.).
 
