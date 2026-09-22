@@ -1,0 +1,112 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Open Firenet",
+        "data": {
+          "host": "IP address or hostname",
+          "scan_interval": "Poll interval (seconds)"
+        },
+        "data_description": {
+          "host": "Example: open-firenet.local or 192.168.1.93",
+          "scan_interval": "How often to poll the bridge, in seconds (10–300)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the device. Check the IP address and that the device is online.",
+      "invalid_response": "Device responded but does not look like an Open Firenet bridge.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connected": {
+        "name": "Connected"
+      },
+      "burning": {
+        "name": "Combustion Active"
+      },
+      "problem": {
+        "name": "Stove Error"
+      },
+      "hopper_lid": {
+        "name": "Pellet Hopper Lid"
+      }
+    },
+    "fan": {
+      "multiair_1": {
+        "name": "MultiAir 1"
+      },
+      "multiair_2": {
+        "name": "MultiAir 2"
+      }
+    },
+    "switch": {
+      "heating_schedule": {
+        "name": "Heating Schedule"
+      },
+      "frost_protection": {
+        "name": "Frost Protection"
+      }
+    },
+    "number": {
+      "setback_temperature": {
+        "name": "Setback Temperature"
+      },
+      "frost_protection_temperature": {
+        "name": "Frost Protection Temperature"
+      },
+      "bake_target_temperature": {
+        "name": "Bake Target Temperature"
+      },
+      "room_temperature_offset": {
+        "name": "Room Temperature Offset"
+      },
+      "multiair_1_area": {
+        "name": "MultiAir 1 Convection Trim"
+      },
+      "multiair_2_area": {
+        "name": "MultiAir 2 Convection Trim"
+      }
+    },
+    "sensor": {
+      "room_temperature": {
+        "name": "Room Temperature"
+      },
+      "combustion_temperature": {
+        "name": "Combustion Chamber Temperature"
+      },
+      "board_temperature": {
+        "name": "Board Temperature"
+      },
+      "pellets_total_kg": {
+        "name": "Pellets Consumed"
+      },
+      "pellet_hours": {
+        "name": "Pellet Operating Hours"
+      },
+      "service_countdown_kg": {
+        "name": "Service Countdown"
+      },
+      "fan_speed_rpm": {
+        "name": "Flue Draft Fan Speed"
+      },
+      "auger_speed_rpm": {
+        "name": "Pellet Auger Speed"
+      },
+      "stove_state": {
+        "name": "Stove State"
+      },
+      "wifi_rssi": {
+        "name": "WiFi Signal Strength"
+      },
+      "uptime_seconds": {
+        "name": "Uptime"
+      }
+    }
+  }
+}

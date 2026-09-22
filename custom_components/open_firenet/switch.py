@@ -30,6 +30,7 @@ class OpenFirenetScheduleSwitch(
     """Switch to toggle the weekly heating schedule on or off."""
 
     _attr_has_entity_name = True
+    _attr_name = "Heating Schedule"
     _attr_translation_key = "heating_schedule"
     _attr_icon = "mdi:calendar-clock"
 
@@ -74,6 +75,7 @@ class OpenFirenetFrostProtectionSwitch(
     """Switch to toggle frost protection mode on or off."""
 
     _attr_has_entity_name = True
+    _attr_name = "Frost Protection"
     _attr_translation_key = "frost_protection"
     _attr_icon = "mdi:snowflake"
 
