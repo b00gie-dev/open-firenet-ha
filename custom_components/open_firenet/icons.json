@@ -32,6 +32,9 @@
       "frost_protection_temperature": {
         "default": "mdi:snowflake-thermometer"
       },
+      "bake_target_temperature": {
+        "default": "mdi:toaster-oven"
+      },
       "multiair_1_area": {
         "default": "mdi:fan-chevron-up"
       },
