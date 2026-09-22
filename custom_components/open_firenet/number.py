@@ -16,6 +16,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    BAKE_TEMP_MAX,
+    BAKE_TEMP_MIN,
+    BAKE_TEMP_STEP,
     DOMAIN,
     FROST_TEMP_MAX,
     FROST_TEMP_MIN,
@@ -27,6 +30,7 @@ from .const import (
     SETBACK_TEMP_MIN,
     SETBACK_TEMP_STEP,
     get_model_name,
+    is_bake_supported,
     is_multiair_supported,
 )
 from .coordinator import OpenFirenetCoordinator
@@ -126,6 +130,33 @@ MULTIAIR_NUMBER_TYPES: tuple[OpenFirenetNumberDescription, ...] = (
     ),
 )
 
+BAKE_NUMBER_TYPE = OpenFirenetNumberDescription(
+    key="bake_target_temperature",
+    name="Bake Target Temperature",
+    device_class=NumberDeviceClass.TEMPERATURE,
+    native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+    native_min_value=BAKE_TEMP_MIN,
+    native_max_value=BAKE_TEMP_MAX,
+    native_step=BAKE_TEMP_STEP,
+    mode=NumberMode.SLIDER,
+    icon="mdi:toaster-oven",
+    value_fn=lambda data: data.get("controls", {}).get(
+        "bake_target_temperature",
+        (
+            data.get("controls", {}).get("bakeTarget", 180)
+            if "bakeTarget" in data.get("controls", {})
+            else (
+                data.get("controls_pos", [])[5]
+                if len(data.get("controls_pos", [])) > 5 and data.get("controls_pos", [])[5] > 0
+                else 180
+            )
+        ),
+    ),
+    set_fn=lambda coord, val: coord.async_set_controls(
+        bakeTarget=int(val)
+    ),
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -140,6 +171,9 @@ async def async_setup_entry(
                 for desc in MULTIAIR_NUMBER_TYPES
             ]
         )
+
+    if is_bake_supported(coordinator.data):
+        entities.append(OpenFirenetNumber(coordinator, entry, BAKE_NUMBER_TYPE))
 
     async_add_entities(entities)
 

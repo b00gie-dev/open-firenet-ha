@@ -27,6 +27,11 @@ FROST_TEMP_MIN = 4.0
 FROST_TEMP_MAX = 10.0
 FROST_TEMP_STEP = 0.5
 
+DOMO_BACK_MODEL_ID = 23
+BAKE_TEMP_MIN = 130
+BAKE_TEMP_MAX = 340
+BAKE_TEMP_STEP = 5
+
 HEATING_POWER_MIN = 30
 HEATING_POWER_MAX = 100
 HEATING_POWER_STEP = 5
@@ -90,3 +95,13 @@ def is_multiair_supported(data: dict) -> bool:
         or "convection_fan1_active" in controls
         or "convectionFan1Active" in controls
     )
+
+
+def is_bake_supported(data: dict) -> bool:
+    """Check if the stove hardware supports a baking oven (DOMO BACK)."""
+    if not isinstance(data, dict):
+        return False
+    stove = data.get("stove", {})
+    model_id = stove.get("model")
+    model_name = stove.get("model_name")
+    return model_id == DOMO_BACK_MODEL_ID or model_name == "DOMO BACK"

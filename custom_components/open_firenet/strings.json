@@ -60,6 +60,9 @@
       "frost_protection_temperature": {
         "name": "Frost Protection Temperature"
       },
+      "bake_target_temperature": {
+        "name": "Bake Target Temperature"
+      },
       "multiair_1_area": {
         "name": "MultiAir 1 Convection Trim"
       },
