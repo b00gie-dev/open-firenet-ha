@@ -1,0 +1,112 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connexion à Open Firenet",
+        "data": {
+          "host": "Adresse IP ou nom d'hôte",
+          "scan_interval": "Intervalle d'interrogation (secondes)"
+        },
+        "data_description": {
+          "host": "Exemple : open-firenet.local ou 192.168.1.93",
+          "scan_interval": "Fréquence de scrutation du pont, en secondes (10–300)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter à l'appareil. Vérifiez l'adresse IP et que l'appareil est allumé.",
+      "invalid_response": "L'appareil a répondu mais ne semble pas être un pont Open Firenet.",
+      "unknown": "Erreur inattendue."
+    },
+    "abort": {
+      "already_configured": "Cet appareil est déjà configuré."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connected": {
+        "name": "Connecté"
+      },
+      "burning": {
+        "name": "Combustion active"
+      },
+      "problem": {
+        "name": "Erreur poêle"
+      },
+      "hopper_lid": {
+        "name": "Couvercle du réservoir"
+      }
+    },
+    "fan": {
+      "multiair_1": {
+        "name": "MultiAir 1"
+      },
+      "multiair_2": {
+        "name": "MultiAir 2"
+      }
+    },
+    "switch": {
+      "heating_schedule": {
+        "name": "Programmation de chauffe"
+      },
+      "frost_protection": {
+        "name": "Protection hors-gel"
+      }
+    },
+    "number": {
+      "setback_temperature": {
+        "name": "Température réduite"
+      },
+      "frost_protection_temperature": {
+        "name": "Température hors-gel"
+      },
+      "bake_target_temperature": {
+        "name": "Température du four"
+      },
+      "room_temperature_offset": {
+        "name": "Calibrage sonde de température"
+      },
+      "multiair_1_area": {
+        "name": "Correction convection MultiAir 1"
+      },
+      "multiair_2_area": {
+        "name": "Correction convection MultiAir 2"
+      }
+    },
+    "sensor": {
+      "room_temperature": {
+        "name": "Température ambiante"
+      },
+      "combustion_temperature": {
+        "name": "Température chambre de combustion"
+      },
+      "board_temperature": {
+        "name": "Température carte mère"
+      },
+      "pellets_total_kg": {
+        "name": "Granulés consommés"
+      },
+      "pellet_hours": {
+        "name": "Heures de chauffe granulés"
+      },
+      "service_countdown_kg": {
+        "name": "Compte à rebours entretien"
+      },
+      "fan_speed_rpm": {
+        "name": "Vitesse extracteur de fumées"
+      },
+      "auger_speed_rpm": {
+        "name": "Vitesse vis d'alimentation"
+      },
+      "stove_state": {
+        "name": "État du poêle"
+      },
+      "wifi_rssi": {
+        "name": "Signal WiFi"
+      },
+      "uptime_seconds": {
+        "name": "Temps de fonctionnement"
+      }
+    }
+  }
+}

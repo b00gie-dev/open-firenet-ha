@@ -79,6 +79,22 @@ def _cleanup_orphaned_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
             entity_reg.async_update_entity(uptime_entity_id, new_entity_id=clean_id)
             _LOGGER.info("Restored clean entity ID %s (was %s)", clean_id, uptime_entity_id)
 
+    # Migrate generic entity_ids (e.g. switch.salon_open_firenet, fan.salon_open_firenet_2) to descriptive names
+    id_migrations = [
+        (Platform.SWITCH, f"{entry.entry_id}_switch_heating_schedule", "heating_schedule"),
+        (Platform.SWITCH, f"{entry.entry_id}_switch_frost_protection", "frost_protection"),
+        (Platform.FAN, f"{entry.entry_id}_fan_multiair_1", "multiair_1"),
+        (Platform.FAN, f"{entry.entry_id}_fan_multiair_2", "multiair_2"),
+    ]
+    for platform, uid, suffix in id_migrations:
+        current_id = entity_reg.async_get_entity_id(platform, DOMAIN, uid)
+        if current_id and (current_id.endswith("_firenet") or current_id.endswith("_firenet_2")):
+            base = current_id[:-2] if current_id.endswith("_2") else current_id
+            target_id = f"{base}_{suffix}"
+            if not entity_reg.async_is_registered(target_id):
+                entity_reg.async_update_entity(current_id, new_entity_id=target_id)
+                _LOGGER.info("Updated generic entity ID %s -> %s", current_id, target_id)
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = OpenFirenetCoordinator(
