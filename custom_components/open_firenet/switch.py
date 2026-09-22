@@ -18,7 +18,10 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: OpenFirenetCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([OpenFirenetScheduleSwitch(coordinator, entry)])
+    async_add_entities([
+        OpenFirenetScheduleSwitch(coordinator, entry),
+        OpenFirenetFrostProtectionSwitch(coordinator, entry),
+    ])
 
 
 class OpenFirenetScheduleSwitch(
@@ -63,3 +66,50 @@ class OpenFirenetScheduleSwitch(
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         await self.coordinator.async_set_controls(heatingTimesActive=False)
+
+
+class OpenFirenetFrostProtectionSwitch(
+    CoordinatorEntity[OpenFirenetCoordinator], SwitchEntity
+):
+    """Switch to toggle frost protection mode on or off."""
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "frost_protection"
+    _attr_icon = "mdi:snowflake"
+
+    def __init__(self, coordinator: OpenFirenetCoordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator)
+        self._entry = entry
+        self._attr_unique_id = f"{entry.entry_id}_switch_frost_protection"
+
+    @property
+    def device_info(self) -> dict:
+        device = self.coordinator.data.get("device", {})
+        stove = self.coordinator.data.get("stove", {})
+        model_name = stove.get("model_name") or get_model_name(stove.get("model"))
+        return {
+            "identifiers": {(DOMAIN, self._entry.entry_id)},
+            "name": device.get("name", "Open-Firenet"),
+            "manufacturer": "Open-Firenet",
+            "model": f"RIKA {model_name}",
+            "sw_version": f"Firmware v{device.get('version', '2.0.0')} (MB {stove.get('mainboard_version', '')})",
+            "configuration_url": f"http://{self.coordinator.host}",
+        }
+
+    @property
+    def is_on(self) -> bool:
+        controls = self.coordinator.data.get("controls", {})
+        c_pos = self.coordinator.data.get("controls_pos", [])
+        if "frost_protection_active" in controls:
+            return bool(controls["frost_protection_active"])
+        if "frostProtectionActive" in controls:
+            return bool(controls["frostProtectionActive"])
+        if len(c_pos) > 29:
+            return bool(c_pos[29])
+        return False
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        await self.coordinator.async_set_controls(frostProtectionActive=True)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        await self.coordinator.async_set_controls(frostProtectionActive=False)

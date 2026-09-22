@@ -20,11 +20,17 @@
     "switch": {
       "heating_schedule": {
         "default": "mdi:calendar-clock"
+      },
+      "frost_protection": {
+        "default": "mdi:snowflake"
       }
     },
     "number": {
       "setback_temperature": {
         "default": "mdi:thermometer-chevron-down"
+      },
+      "frost_protection_temperature": {
+        "default": "mdi:snowflake-thermometer"
       },
       "multiair_1_area": {
         "default": "mdi:fan-chevron-up"
