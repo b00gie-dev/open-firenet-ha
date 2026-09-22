@@ -74,8 +74,9 @@ Copy the `custom_components/open_firenet/` directory into your Home Assistant `<
 | Entity ID | Name | Description | Range |
 |---|---|---|---|
 | `number.open_firenet_setback_temperature` | Setback Temperature | Maintenance temperature when heating times are inactive | 10.0°C – 25.0°C (step 0.5) |
-| `number.open_firenet_frost_protection_temperature` | Frost Protection Temperature | Target temperature maintained when frost protection is active | 4.0°C – 10.0°C (step 0.5) |
+| `number.open_firenet_frost_protection_temperature` | Frost Protection Temperature | Target temperature maintained when frost protection is active | 4.0°C – 10.0°C (step 1.0) |
 | `number.open_firenet_bake_target_temperature` | Bake Target Temperature | Baking oven chamber target temperature *(DOMO BACK model 23)* | 130°C – 340°C (step 5) |
+| `number.open_firenet_room_temperature_offset` | Room Temperature Offset | Room temperature sensor calibration offset | -4.0°C – +4.0°C (step 0.1) |
 | `number.open_firenet_multiair_1_convection_trim` | MultiAir 1 Convection Trim | Fan 1 convection speed trim *(MultiAir models)* | -30% to +30% (step 5) |
 | `number.open_firenet_multiair_2_convection_trim` | MultiAir 2 Convection Trim | Fan 2 convection speed trim *(MultiAir models)* | -30% to +30% (step 5) |
 

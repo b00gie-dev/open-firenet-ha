@@ -26,6 +26,9 @@ from .const import (
     MULTIAIR_TRIM_MAX,
     MULTIAIR_TRIM_MIN,
     MULTIAIR_TRIM_STEP,
+    ROOM_OFFSET_MAX,
+    ROOM_OFFSET_MIN,
+    ROOM_OFFSET_STEP,
     SETBACK_TEMP_MAX,
     SETBACK_TEMP_MIN,
     SETBACK_TEMP_STEP,
@@ -89,6 +92,32 @@ NUMBER_TYPES: tuple[OpenFirenetNumberDescription, ...] = (
         ),
         set_fn=lambda coord, val: coord.async_set_controls(
             frostProtectionTemp=float(val)
+        ),
+    ),
+    OpenFirenetNumberDescription(
+        key="room_temperature_offset",
+        name="Room Temperature Offset",
+        device_class=NumberDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        native_min_value=ROOM_OFFSET_MIN,
+        native_max_value=ROOM_OFFSET_MAX,
+        native_step=ROOM_OFFSET_STEP,
+        mode=NumberMode.SLIDER,
+        icon="mdi:thermometer-lines",
+        value_fn=lambda data: data.get("controls", {}).get(
+            "room_temperature_offset",
+            (
+                data.get("controls", {}).get("roomTempOffset", 0) / 10.0
+                if "roomTempOffset" in data.get("controls", {})
+                else (
+                    data.get("controls_pos", [])[31] / 10.0
+                    if len(data.get("controls_pos", [])) > 31
+                    else 0.0
+                )
+            ),
+        ),
+        set_fn=lambda coord, val: coord.async_set_controls(
+            room_temperature_offset=float(val)
         ),
     ),
 )

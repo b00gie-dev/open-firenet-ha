@@ -35,6 +35,9 @@
       "bake_target_temperature": {
         "default": "mdi:toaster-oven"
       },
+      "room_temperature_offset": {
+        "default": "mdi:thermometer-lines"
+      },
       "multiair_1_area": {
         "default": "mdi:fan-chevron-up"
       },
