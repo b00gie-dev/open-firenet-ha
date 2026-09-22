@@ -17,6 +17,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
+    FROST_TEMP_MAX,
+    FROST_TEMP_MIN,
+    FROST_TEMP_STEP,
     MULTIAIR_TRIM_MAX,
     MULTIAIR_TRIM_MIN,
     MULTIAIR_TRIM_STEP,
@@ -56,6 +59,32 @@ NUMBER_TYPES: tuple[OpenFirenetNumberDescription, ...] = (
         ),
         set_fn=lambda coord, val: coord.async_set_controls(
             setback_temperature=float(val)
+        ),
+    ),
+    OpenFirenetNumberDescription(
+        key="frost_protection_temperature",
+        name="Frost Protection Temperature",
+        device_class=NumberDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        native_min_value=FROST_TEMP_MIN,
+        native_max_value=FROST_TEMP_MAX,
+        native_step=FROST_TEMP_STEP,
+        mode=NumberMode.SLIDER,
+        icon="mdi:snowflake-thermometer",
+        value_fn=lambda data: data.get("controls", {}).get(
+            "frost_protection_temperature",
+            (
+                data.get("controls", {}).get("frostProtectionTemp", 50) / 10.0
+                if "frostProtectionTemp" in data.get("controls", {})
+                else (
+                    data.get("controls_pos", [])[30] / 10.0
+                    if len(data.get("controls_pos", [])) > 30 and data.get("controls_pos", [])[30] > 0
+                    else 5.0
+                )
+            ),
+        ),
+        set_fn=lambda coord, val: coord.async_set_controls(
+            frostProtectionTemp=float(val)
         ),
     ),
 )

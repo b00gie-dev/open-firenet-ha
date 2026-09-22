@@ -48,11 +48,17 @@
     "switch": {
       "heating_schedule": {
         "name": "Heating Schedule"
+      },
+      "frost_protection": {
+        "name": "Frost Protection"
       }
     },
     "number": {
       "setback_temperature": {
         "name": "Setback Temperature"
+      },
+      "frost_protection_temperature": {
+        "name": "Frost Protection Temperature"
       },
       "multiair_1_area": {
         "name": "MultiAir 1 Convection Trim"
