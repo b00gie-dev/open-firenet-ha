@@ -63,6 +63,9 @@
       "bake_target_temperature": {
         "name": "Bake Target Temperature"
       },
+      "room_temperature_offset": {
+        "name": "Room Temperature Offset"
+      },
       "multiair_1_area": {
         "name": "MultiAir 1 Convection Trim"
       },

@@ -36,7 +36,11 @@ def _cleanup_orphaned_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
     valid_unique_ids = {
         f"{entry.entry_id}_climate",
         f"{entry.entry_id}_switch_heating_schedule",
+        f"{entry.entry_id}_switch_frost_protection",
         f"{entry.entry_id}_number_setback_temperature",
+        f"{entry.entry_id}_number_frost_protection_temperature",
+        f"{entry.entry_id}_number_bake_target_temperature",
+        f"{entry.entry_id}_number_room_temperature_offset",
         f"{entry.entry_id}_number_multiair_1_area",
         f"{entry.entry_id}_number_multiair_2_area",
         f"{entry.entry_id}_fan_multiair_1",
