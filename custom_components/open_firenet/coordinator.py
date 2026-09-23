@@ -17,8 +17,17 @@ _LOGGER = logging.getLogger(__name__)
 _CAMEL_BOUNDARY = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
 
 
+# Command keys whose /api/state name is not a plain snake_case of the command key.
+_STATE_KEY_ALIASES = {
+    "setBackTemp": "setback_temperature",
+    "frostProtectionTemp": "frost_protection_temperature",
+    "roomTempOffset": "room_temperature_offset",
+    "bakeTarget": "bake_target_temperature",
+}
+
+
 def _to_snake(key: str) -> str:
-    return _CAMEL_BOUNDARY.sub("_", key).lower()
+    return _STATE_KEY_ALIASES.get(key) or _CAMEL_BOUNDARY.sub("_", key).lower()
 
 
 class OpenFirenetCoordinator(DataUpdateCoordinator):

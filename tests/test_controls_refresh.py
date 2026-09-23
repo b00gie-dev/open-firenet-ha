@@ -24,6 +24,10 @@ def _entity_id(hass, entry, platform: str, unique_suffix: str) -> str:
         ("heatingTimesActive", "heating_times_active"),
         ("frostProtectionActive", "frost_protection_active"),
         ("on", "on"),
+        ("setBackTemp", "setback_temperature"),
+        ("frostProtectionTemp", "frost_protection_temperature"),
+        ("roomTempOffset", "room_temperature_offset"),
+        ("bakeTarget", "bake_target_temperature"),
     ],
 )
 def test_to_snake(camel, snake):
@@ -91,3 +95,46 @@ async def test_failed_command_leaves_state_unchanged(hass, bridge, setup_integra
         await hass.services.async_call("fan", "turn_off", {"entity_id": entity_id}, blocking=True)
 
     assert hass.states.get(entity_id).state == "on"
+
+
+@pytest.mark.parametrize(
+    ("suffix", "value", "bridge_key"),
+    [
+        ("number_setback_temperature", 18.5, "setback_temperature"),
+        ("number_frost_protection_temperature", 7.0, "frost_protection_temperature"),
+        ("number_room_temperature_offset", -1.5, "room_temperature_offset"),
+        ("number_multiair_2_area", 10, "convection_fan2_area"),
+    ],
+)
+async def test_number_reflects_immediately(hass, bridge, setup_integration, suffix, value, bridge_key):
+    entity_id = _entity_id(hass, setup_integration, "number", suffix)
+
+    await hass.services.async_call(
+        "number", "set_value", {"entity_id": entity_id, "value": value}, blocking=True
+    )
+
+    assert bridge.state["controls"][bridge_key] == value
+    assert float(hass.states.get(entity_id).state) == value
+
+
+@pytest.mark.parametrize("setup_integration", ["domo_back"], indirect=True)
+async def test_bake_target_reflects_immediately(hass, bridge, setup_integration):
+    entity_id = _entity_id(hass, setup_integration, "number", "number_bake_target_temperature")
+
+    await hass.services.async_call(
+        "number", "set_value", {"entity_id": entity_id, "value": 200}, blocking=True
+    )
+
+    assert bridge.state["controls"]["bake_target_temperature"] == 200
+    assert float(hass.states.get(entity_id).state) == 200
+
+
+async def test_optimistic_value_is_visible_before_refresh(hass, bridge, setup_integration):
+    """Even if the bridge did not apply the value yet, the entity shows the requested one first."""
+    coordinator = hass.data["open_firenet"][setup_integration.entry_id]
+    seen = []
+    coordinator.async_add_listener(lambda: seen.append(dict(coordinator.data["controls"])))
+
+    await coordinator.async_set_controls(frostProtectionTemp=9.0)
+
+    assert seen[0]["frost_protection_temperature"] == 9.0

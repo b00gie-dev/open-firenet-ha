@@ -74,6 +74,12 @@ COMMAND_TO_STATE_KEY = {
     "convectionFan2Level": "convection_fan2_level",
     "heatingTimesActive": "heating_times_active",
     "frostProtectionActive": "frost_protection_active",
+    "convectionFan1Area": "convection_fan1_area",
+    "convectionFan2Area": "convection_fan2_area",
+    "setback_temperature": "setback_temperature",
+    "frostProtectionTemp": "frost_protection_temperature",
+    "room_temperature_offset": "room_temperature_offset",
+    "bakeTarget": "bake_target_temperature",
 }
 
 
@@ -126,7 +132,9 @@ async def bridge(socket_enabled):
 
 
 @pytest.fixture
-async def setup_integration(hass, bridge):
+async def setup_integration(hass, bridge, request):
+    if getattr(request, "param", None) == "domo_back":
+        bridge.state["stove"]["model_name"] = "DOMO BACK"
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_HOST: bridge.host, CONF_SCAN_INTERVAL: 300},
