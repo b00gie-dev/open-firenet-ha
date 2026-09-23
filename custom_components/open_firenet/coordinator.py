@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from datetime import timedelta
 
 import aiohttp
@@ -12,6 +13,12 @@ from .api import OpenFirenetClient
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
+_CAMEL_BOUNDARY = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
+
+
+def _to_snake(key: str) -> str:
+    return _CAMEL_BOUNDARY.sub("_", key).lower()
 
 
 class OpenFirenetCoordinator(DataUpdateCoordinator):
@@ -36,9 +43,13 @@ class OpenFirenetCoordinator(DataUpdateCoordinator):
 
     async def async_set_controls(self, **kwargs) -> None:
         await self._client.set_controls(kwargs)
+        # /api/state exposes controls in snake_case while commands are sent in camelCase,
+        # and entities read the snake_case key first: write both so the optimistic value
+        # is actually visible, then re-read the device (its model is updated on POST).
         if self.data and "controls" in self.data:
             current_controls = self.data["controls"].copy()
-            current_controls.update(kwargs)
+            for key, value in kwargs.items():
+                current_controls[key] = value
+                current_controls[_to_snake(key)] = value
             self.async_set_updated_data({**self.data, "controls": current_controls})
-        else:
-            await self.async_request_refresh()
+        await self.async_refresh()
